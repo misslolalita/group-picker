@@ -5,7 +5,6 @@
   <title>Your Group – Balanced Picker</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    /* ====== GLOBAL STYLES ====== */
     body {
       margin: 0;
       min-height: 100vh;
@@ -13,8 +12,8 @@
       justify-content: center;
       align-items: center;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #0f172a;        /* Nötr koyu zemin – grup gelince değişecek */
-      transition: background 0.4s ease;
+      background: #ffffff; /* Başlangıç rengi – grup gelince değişecek */
+      transition: background 0.5s ease;
     }
 
     .card {
@@ -65,6 +64,7 @@
       opacity: 0;
       transform: translateY(16px) scale(0.9);
     }
+
     .result.visible {
       animation: popIn 0.6s cubic-bezier(0.19, 1, 0.22, 1) forwards;
     }
@@ -160,9 +160,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
   <script>
-    /* ============================
-       🔥 FIREBASE CONFIG
-       ============================ */
+    /* FIREBASE */
     const firebaseConfig = {
       apiKey: "AIzaSyDEsaf6zVAF6Zc623zkTis93GZXp8_hAU",
       authDomain: "group-picker.firebaseapp.com",
@@ -182,31 +180,13 @@
     const sparkles = document.getElementById("sparkles");
     const statusText = document.getElementById("statusText");
 
-    /* Gruplar + renkler */
     const groups = {
-      red: {
-        label: "Red",
-        className: "group-red",
-        emoji: "🔴",
-        bg: "#ff4d4d",
-      },
-      orange: {
-        label: "Orange",
-        className: "group-orange",
-        emoji: "🟠",
-        bg: "#ff944d",
-      },
-      blue: {
-        label: "Blue",
-        className: "group-blue",
-        emoji: "🔵",
-        bg: "#4d79ff",
-      },
+      red:    { label: "Red",    className: "group-red",    emoji: "🔴", bg: "#ff4d4d" },
+      orange: { label: "Orange", className: "group-orange", emoji: "🟠", bg: "#ff944d" },
+      blue:   { label: "Blue",   className: "group-blue",   emoji: "🔵", bg: "#4d79ff" }
     };
 
-    /* ============================
-       BUTON TIKLAMA
-       ============================ */
+    /* BUTON */
     btn.addEventListener("click", () => {
       if (btn.disabled) return;
 
@@ -217,17 +197,13 @@
       assignBalanced();
     });
 
-    /* =========================================
-       ⭐ DENGELİ ATAMA (HER TIKLAMADA SAYI ARTAR)
-       ========================================= */
+    /* DENGELİ ATAMA */
     function assignBalanced() {
       let chosenKey = null;
 
       countsRef.transaction(
-        (current) => {
-          if (!current) {
-            current = { red: 0, orange: 0, blue: 0 };
-          }
+        current => {
+          if (!current) current = { red: 0, orange: 0, blue: 0 };
 
           const entries = Object.entries(current);
           const values = entries.map(([k, v]) => v);
@@ -237,10 +213,8 @@
             .filter(([k, v]) => v === minVal)
             .map(([k]) => k);
 
-          chosenKey =
-            candidates[Math.floor(Math.random() * candidates.length)];
+          chosenKey = candidates[Math.floor(Math.random() * candidates.length)];
           current[chosenKey]++;
-
           return current;
         },
         (error, committed) => {
@@ -252,17 +226,15 @@
           }
 
           const group = groups[chosenKey];
-          showResult(chosenKey, group);
+          showResult(group);
           btn.textContent = "Done ✅";
           statusText.textContent = "Group assigned!";
         }
       );
     }
 
-    /* ============================
-       UI GÜNCELLEME
-       ============================ */
-    function showResult(key, group) {
+    /* UI */
+    function showResult(group) {
       resultBox.className = "result visible " + group.className;
       resultBox.innerHTML = `
         <div class="group-label">
@@ -276,7 +248,7 @@
     }
 
     function setBackgroundColor(color) {
-      document.body.style.background = color;   // TAM SAYFA RENK
+      document.body.style.background = color;
     }
 
     function triggerSparkles() {
